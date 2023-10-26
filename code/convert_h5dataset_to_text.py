@@ -5,8 +5,8 @@ from tqdm import tqdm
 model_name = "google/bert_uncased_L-4_H-256_A-4"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-inputf = "/Users/yong/Desktop/fedkube/code/data/reviews.h5"
-outputf = "/Users/yong/Desktop/fedkube/code/data/reviews.jsonl"
+inputf = "data/reviews.h5"
+outputf = "data/reviews.jsonl"
 
 wf = open(outputf, "w+")
 
