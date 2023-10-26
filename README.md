@@ -9,7 +9,8 @@ Extending PrivateKube with Federated Learning
 1. `cd code`
 2. `mkdir data`
 3. `touch reviews.h5`
-4. `python dataset.py getmini`
+4. `python3 dataset.py getmini`
+5. `python3 convert_h5dataset_to_text.py`
 
 ### Run the Cifar Example
 

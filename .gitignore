@@ -7,3 +7,6 @@ code/data/*
 
 # DS store
 **/.DS_Store
+
+# pt file
+code/tut2-model.pt

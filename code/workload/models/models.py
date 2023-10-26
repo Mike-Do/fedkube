@@ -110,6 +110,60 @@ class LSTMClassifier(nn.Module):
         )
 
 
+class FLSTMClassifier(nn.Module):
+    # https://github.com/prakashpandey9/Text-Classification-Pytorch/blob/master/load_data.py
+    # + Opacus example
+    def __init__(
+        self,
+        batch_size,
+        output_size,
+        hidden_size,
+        vocab_size,
+        embedding_length,
+        weights,
+        dropout,
+        dp,
+    ):
+        super(LSTMClassifier, self).__init__()
+
+        self.batch_size = batch_size
+        self.output_size = output_size
+        self.hidden_size = hidden_size
+        self.vocab_size = vocab_size
+        self.embedding_length = embedding_length
+        self.embedding = nn.Embedding(
+            vocab_size, embedding_length
+        )  # Initializing the look-up table.
+        self.embedding.weight = nn.Parameter(
+            weights, requires_grad=False
+        )  # Assigning the look-up table to the pre-trained GloVe word embedding.
+        if dp:
+            logging.info("Building DPLSTM.")
+            self.lstm = DPLSTM(embedding_length, hidden_size, batch_first=True)
+        else:
+            logging.info("Building non-DP LSTM.")
+            self.lstm = nn.LSTM(embedding_length, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+        if dropout > 0:
+            self.dropout = nn.Dropout(dropout)
+        else:
+            self.dropout = None
+
+    def forward(self, input, hidden):
+        input_emb = self.embedding(input)
+        lstm_out, _ = self.lstm(input_emb, hidden)
+        if not self.dropout is None:
+            lstm_out = self.dropout(lstm_out)
+        output = self.fc(lstm_out)
+        return output[:, -1]
+
+    def init_hidden(self, batch_size):
+        return (
+            torch.zeros(1, batch_size, self.hidden_size),
+            torch.zeros(1, batch_size, self.hidden_size),
+        )
+
+
 class FineTunedBert(BertForSequenceClassification):
     @staticmethod
     def build_new(output_dim, model_name="google/bert_uncased_L-4_H-256_A-4"):
