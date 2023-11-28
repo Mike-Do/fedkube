@@ -38,7 +38,6 @@ docutils==0.16
 entrypoints==0.3
 filelock==3.0.12
 fire==0.4.0
-flwr==1.5.0
 fsspec==0.7.4
 future==0.18.2
 gast==0.3.3
@@ -120,7 +119,6 @@ pipdeptree==1.0.0
 pkginfo==1.5.0.1
 plotly==4.14.3
 pluggy==0.13.1
--e git+https://github.com/Mike-Do/PrivateKube.git@14f575e77021ab7baca30f4061140ec83bdc96a7#egg=privatekube&subdirectory=privatekube
 prometheus-client==0.7.1
 prompt-toolkit==3.0.7
 protobuf==3.17.3
@@ -182,8 +180,8 @@ tqdm==4.49.0
 traitlets==4.3.3
 transformers==3.4.0
 twine==3.2.0
-typed-ast==1.4.2
 typer==0.3.2
+typed-ast==1.4.2
 typing-extensions==3.7.4.3
 uritemplate==3.0.1
 urllib3==1.25.10

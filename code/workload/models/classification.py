@@ -85,15 +85,16 @@ model_args = {
 }
 
 training_args = {
-    "device": "cuda",
+    "device": "cpu",
     "learning_rate": 0.01,
     "dp": 0,
     "dp_eval": 0,
     "user_level": 0,
     "epsilon": 5.0,
     "delta": 1e-5,
-    "n_epochs": 15,
-    "batch_size": 64,
+    # "n_epochs": 15,
+    "n_epochs": 1,
+    "batch_size": 1024,
     "virtual_batch_multiplier": 2,
     "adaptive_batch_size": 1,
     "noise": -1.0,
