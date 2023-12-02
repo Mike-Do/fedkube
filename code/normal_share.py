@@ -15,8 +15,6 @@ import random
 import pandas as pd
 from collections import OrderedDict
 
-# inheritance of Flower's client manager and rewrite sampling function
-
 class Client:
     def __init__(self, id, demands, budgets):
         self.id = id
