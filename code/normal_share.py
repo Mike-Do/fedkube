@@ -11,15 +11,9 @@ model.
 
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 import random
-import argparse
-import os
-import tempfile
-import sys
 import pandas as pd
 from collections import OrderedDict
-import warnings
 
 # inheritance of Flower's client manager and rewrite sampling function
 
@@ -53,52 +47,52 @@ def normal_share(clients, total_clients, num_to_sample):
     and how many users to sample and then returns a list of the clients that will be used for
     the federated learning model based on sampling from the normal distribution of their differences.
     """
-    # calculate the differences between the demands and budgets and associate them with their client id
-    # plot the differences and make sure they follow the normal distribution
+    # sort differences in ascending order
+    client_diffs = [(client.id, client.budgets - client.demands) for client in clients]
+    # only consider positive differences (budgets - demands > 0)
+    client_diffs = [diff for diff in client_diffs if diff[1] > 0]
+    # sort in ascending order
+    client_diffs.sort(key=lambda x: x[1])
     # find median
-    # handle duplicate differences
-    # sort client' id's in ascending order
-    # sample client id's based on how their differences are normally distributed
-    # calculate percetange based on X / total
-
-    # Calculate positive differences and associate them with client IDs
-    client_diffs = [(client.id, client.budgets - client.demands) for client in clients if client.budgets - client.demands > 0]
-
-    if not client_diffs:
-        print("No clients with positive differences found.")
-        return []
-
-    # sort based on ascending order of client id
-    # get the median
-    # calculate the percents based on num_to_sample / total clients
-    # sample from the left and right of the median based on the percents
-
-    # Sort based on closeness to the mean
-    mean_diff = np.mean([diff[1] for diff in client_diffs])
-    std_diff = np.std([diff[1] for diff in client_diffs])
-    client_diffs.sort(key=lambda x: abs(x[1] - mean_diff))
-
-    # print the sorted positive differences
+    median = client_diffs[len(client_diffs) // 2][1]
+    # print the sorted positive differences to verify
     print("Sorted positive differences:")
     for diff in client_diffs:
         print(diff)
-
-    # Plot the sorted positive differences
-    plt.bar([client[0] for client in client_diffs], [diff[1] for diff in client_diffs])
+    # plot the differences and make sure they follow the normal distribution
+    # x-axis: client id based on ascending order of differences
+    # y-axis: differences
+    # Create a new list for x-axis labels (client IDs)
+    client_ids = [client[0] for client in client_diffs]
+    
+    # plot the differences and make sure they follow the normal distribution
+    # x-axis: sequential numbers representing sorted order
+    # y-axis: differences
+    plt.bar(range(len(client_diffs)), [diff[1] for diff in client_diffs])
+    
+    # Set the x-axis labels to client IDs
+    plt.xticks(range(len(client_diffs)), client_ids)
+    
     plt.xlabel('Client ID')
     plt.ylabel('Positive Difference')
     plt.title('Sorted Positive Differences between Budgets and Demands per Client')
     plt.show()
 
-    # Sample from the normal distribution
-    sampled_values = np.random.normal(mean_diff, std_diff, num_to_sample)
-    sampled_clients = []
-    for val in sampled_values:
-        closest_client = min(client_diffs, key=lambda x: abs(x[1] - val))
-        sampled_clients.append(closest_client[0])
-        client_diffs.remove(closest_client)  # Remove to avoid duplicates
+    # sample from the normal distribution
+    median_index = len(client_diffs) // 2
 
-    return [client for client in clients if client.id in sampled_clients]
+    # calc the number of samples to take from each side of the median
+    num_samples_each_side = num_to_sample // 2
+
+    # sample from the left and right of the median
+    left_sample_indices = random.sample(range(median_index), num_samples_each_side)
+    # num_to_sample - num_samples_each_side is the number of samples to take from the right
+    right_sample_indices = random.sample(range(median_index, len(client_diffs)), num_to_sample - num_samples_each_side)
+
+    # get the client IDs from the sampled indices
+    sampled_client_ids = [client_diffs[i][0] for i in left_sample_indices + right_sample_indices]
+
+    return [client for client in clients if client.id in sampled_client_ids]
 
 
 # create main function to run the program
