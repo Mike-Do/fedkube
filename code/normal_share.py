@@ -51,46 +51,52 @@ def normal_share(clients, total_clients, num_to_sample):
     client_diffs = [diff for diff in client_diffs if diff[1] > 0]
     # sort in ascending order
     client_diffs.sort(key=lambda x: x[1])
-    # find median
-    median = client_diffs[len(client_diffs) // 2][1]
+
+    '''Print sorted clients'''
     # print the sorted positive differences to verify
-    print("Sorted positive differences:")
-    for diff in client_diffs:
-        print(diff)
-    # plot the differences and make sure they follow the normal distribution
-    # x-axis: client id based on ascending order of differences
-    # y-axis: differences
-    # Create a new list for x-axis labels (client IDs)
-    client_ids = [client[0] for client in client_diffs]
+    # print("Sorted positive differences:")
+    # for diff in client_diffs:
+    #     print(diff)
+    # # plot the differences and make sure they follow the normal distribution
+    # # x-axis: client id based on ascending order of differences
+    # # y-axis: differences
+    # # Create a new list for x-axis labels (client IDs)
+    # client_ids = [client[0] for client in client_diffs]
     
-    # plot the differences and make sure they follow the normal distribution
-    # x-axis: sequential numbers representing sorted order
-    # y-axis: differences
-    plt.bar(range(len(client_diffs)), [diff[1] for diff in client_diffs])
+    # # plot the differences and make sure they follow the normal distribution
+    # # x-axis: sequential numbers representing sorted order
+    # # y-axis: differences
+    # plt.bar(range(len(client_diffs)), [diff[1] for diff in client_diffs])
     
-    # Set the x-axis labels to client IDs
-    plt.xticks(range(len(client_diffs)), client_ids)
+    # # Set the x-axis labels to client IDs
+    # plt.xticks(range(len(client_diffs)), client_ids)
     
-    plt.xlabel('Client ID')
-    plt.ylabel('Positive Difference')
-    plt.title('Sorted Positive Differences between Budgets and Demands per Client')
-    plt.show()
+    # plt.xlabel('Client ID')
+    # plt.ylabel('Positive Difference')
+    # plt.title('Sorted Positive Differences between Budgets and Demands per Client')
+    # plt.show()
 
     # sample from the normal distribution
     median_index = len(client_diffs) // 2
+    median_value = client_diffs[median_index][1]
 
-    # calc the number of samples to take from each side of the median
-    num_samples_each_side = num_to_sample // 2
+    # get last value as sorted in ascending order
+    largest_diff = client_diffs[-1][1]
 
-    # sample from the left and right of the median
-    left_sample_indices = random.sample(range(median_index), num_samples_each_side)
-    # num_to_sample - num_samples_each_side is the number of samples to take from the right
-    right_sample_indices = random.sample(range(median_index, len(client_diffs)), num_to_sample - num_samples_each_side)
+    # mean = median, standard_dev = largest_diff - median / 3 (based on empiricial rule)
+    std_dev = (largest_diff - median_value) / 3
+    sampled_values = np.random.normal(median_value, std_dev, num_to_sample)
 
-    # get the client IDs from the sampled indices
-    sampled_client_ids = [client_diffs[i][0] for i in left_sample_indices + right_sample_indices]
+    # select clients whose differences are closest to the sampled values
+    sampled_clients = []
+    for val in sampled_values:
+        # abs difference of sampled value and actual
+        closest_client = min(client_diffs, key=lambda x: abs(x[1] - val))
+        sampled_clients.append(closest_client[0])
+        # remove to avoid sampling duplicates
+        client_diffs.remove(closest_client)  
 
-    return [client for client in clients if client.id in sampled_client_ids]
+    return [client for client in clients if client.id in sampled_clients]
 
 
 # create main function to run the program
@@ -98,14 +104,30 @@ def main():
     # run the read_csv function on file ./clients_budget_demands.csv
     clients = read_csv("./clients_budget_demand.csv")
 
-    # run the normal_share function on the clients list
-    sampled_clients = normal_share(clients, 10, 2)
+    '''Run Normal Share Once'''
+    # # run the normal_share function on the clients list
+    # sampled_clients = normal_share(clients, 10, 2)
 
-    # print length of sampled clients
-    print("Length:", len(sampled_clients))
+    # # print length of sampled clients
+    # print("Length:", len(sampled_clients))
 
-    # print the sampled clients
-    for client in sampled_clients:
-        print(client.id)
+    # # print the sampled clients
+    # for client in sampled_clients:
+    #     print(client.id)
+
+    '''Run Normal Share 100 Times'''
+    # Initialize a hashmap to store frequencies
+    client_frequency = {client.id: 0 for client in clients}
+
+    # run normal_share 100 times
+    for _ in range(100):
+        sampled_clients = normal_share(clients, len(clients), 2)
+        for client in sampled_clients:
+            client_frequency[client.id] += 1
+
+    # print the frequency map
+    print("Client Sampling Frequency:")
+    for client_id, frequency in client_frequency.items():
+        print(f"Client ID {client_id}: {frequency}")
 
 main()
