@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import warnings
+import json
 
 import flwr as fl
 import torch
@@ -45,6 +46,15 @@ def load_data():
     blocks = {
             0: "0-0",
             1: "1-0",
+            2: "2-0",
+            3: "3-0",
+            4: "4-0",
+            5: "5-0",
+            6: "6-0",
+            7: "7-0",
+            8: "8-0",
+            9: "9-0",
+            10: "10-0",
     }
     block = blocks[client_idx]
     # select df with group_key of 0-0
@@ -191,10 +201,30 @@ def main():
     trainloader, testloader = load_data()
     print("Done")
 
+    print("Privacy Config loaded")
+    client_privacy_configs = None
+    privacy_configs_csv = pd.read_csv("/users/zyong2/data/zyong2/class/scripts/clients_budget_demand.csv")
+    # rename columns: Budget -> privacy_budget, Demand -> demand
+    privacy_configs_csv = privacy_configs_csv.rename(columns={"Budget": "privacy_budget", "Demand": "demand"})
+    # get row of f"Client_{client_idx+1}"
+    _client_privacy_configs = privacy_configs_csv[privacy_configs_csv["Client"] == f"Client_{client_idx+1}"]
+    client_privacy_configs = {}
+    client_privacy_configs["privacy_budget"] = _client_privacy_configs["privacy_budget"].values[0]
+    client_privacy_configs["demand"] = _client_privacy_configs["demand"].values[0]
+
     # Flower client
-    class IMDBClient(fl.client.NumPyClient):
+    class AmazonClient(fl.client.NumPyClient):
+        def __init__(self, client_privacy_configs):
+            fl.client.NumPyClient.__init__(self)
+            assert client_privacy_configs is not None
+            self.privacy_budget = int(client_privacy_configs["privacy_budget"])
+            self.demand = int(client_privacy_configs["demand"])
+
         def get_parameters(self, config):
             return [val.cpu().numpy() for _, val in net.state_dict().items()]
+        
+        def get_properties(self, config):
+            return {"privacy_budget": self.privacy_budget, "demand": self.demand}
 
         def set_parameters(self, parameters):
             params_dict = zip(net.state_dict().keys(), parameters)
@@ -206,6 +236,10 @@ def main():
             print("(fit) Training Started...")
             train(net, trainloader, epochs=3)
             print("(fit) Training Finished.")
+
+            print("(fit) Deduct privacy budget...")
+            self.privacy_budget -= self.demand
+
             return self.get_parameters(config={}), len(trainloader), {}
 
         def evaluate(self, parameters, config):
@@ -215,9 +249,9 @@ def main():
             return float(loss), len(testloader), {"accuracy": float(accuracy)}
 
     # Start client
-    ipnip = "172.20.211.1"
-    ipnport = "8230"
-    fl.client.start_numpy_client(server_address=f"{ipnip}:{ipnport}", client=IMDBClient())
+    ipnip = "0.0.0.0"
+    ipnport = "8000"
+    fl.client.start_numpy_client(server_address=f"{ipnip}:{ipnport}", client=AmazonClient(client_privacy_configs=client_privacy_configs))
 
 
 if __name__ == "__main__":
