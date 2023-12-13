@@ -35,10 +35,26 @@ We tested the code on Brown's CCV compute cluster (`gpu-he`) with 6 V100 GPUs on
     ```bash
     screen -S server
 
-    # inside server
+    # inside screen
     python3 fedlearn/dpfedavgfixed_hf_server.py \
         --num_to_sample 2 \
         --total_clients 10
     ```
 
-3. 
+4. Exit the screen and use `screen` to launch different clients. Here, we set up the first client. Once all 10 clients are set up, the server will then begin federated learning with 3 rounds of training.
+
+    ```bash
+    screen -S client1
+
+    # inside screen
+    python3 fedlearn/hf_clients.py \
+        --total_clients 10 \
+        --client_idx 0 \
+        --total_training_rounds 3 \
+        --amazon_reviews_jsonl_path PATH_TO_DATA \
+        --privacy_configs_csv_path fedlearn/clients_budget_demand.csv
+    ```
+
+5. You should be able to obtain result that shows the accuracy after each round of training. 
+
+    ![Example result](fedlearn/example_result.png)
