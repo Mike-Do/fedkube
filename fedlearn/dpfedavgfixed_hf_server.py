@@ -15,6 +15,8 @@ from flwr.common import (
 from flwr.server.client_manager import SimpleClientManager
 import numpy as np
 
+import argparse
+
 class NormalShareClientManager(fl.server.SimpleClientManager):
     def __init__(self, total_clients, num_to_sample):
         super().__init__()
@@ -112,8 +114,17 @@ def weighted_average(metrics):
 
 if __name__ == "__main__":
     # Define strategy
-    num_to_sample = 2
-    total_clients = 3
+    args = argparse.ArgumentParser()
+    args.add_argument("--num_to_sample", type=int, default=4)
+    args.add_argument("--total_clients", type=int, default=5)
+    args.add_argument("--ipnip", type=str, default="0.0.0.0")
+    args.add_argument("--ipnport", type=str, default="8000")
+
+    args = args.parse_args()
+
+    num_to_sample = args.num_to_sample
+    total_clients = args.total_clients
+
     print("Total number of clients: ", total_clients)
     print("Number of clients to sample: ", num_to_sample)
 
@@ -129,14 +140,11 @@ if __name__ == "__main__":
         strategy, num_to_sample, clip_norm = 0.5, noise_multiplier = 0.01, server_side_noising = True)
 
     # Start server
-    ipnip = "0.0.0.0"
-    ipnport = "8000"
+    ipnip = args.ipnip
+    ipnport = args.ipnport
     fl.server.start_server(
         server_address=f"{ipnip}:{ipnport}",
         config=fl.server.ServerConfig(num_rounds=3),
-        # strategy=strategy,
         strategy=strategy_dpfixed,
         client_manager=NormalShareClientManager(total_clients=total_clients, num_to_sample=num_to_sample),
     )
-
-# https://flower.dev/docs/framework/how-to-configure-clients.html
