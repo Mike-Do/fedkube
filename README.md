@@ -20,6 +20,6 @@ We tested the code on Brown's CCV compute cluster (`gpu-he`) with 6 V100 GPUs on
 
 1. Calls interactive 6 GPUs with 50GB CPU memory for 4 hours. We need the interactive mode for ease of launching server and clients.
 
-`interact -q gpu-he -g 6 -m 50g -n 4 -t 4:00:00` 
+    `interact -q gpu-he -g 6 -m 50g -n 4 -t 4:00:00` 
 
 2. 
