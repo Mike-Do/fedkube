@@ -55,6 +55,6 @@ We tested the code on Brown's CCV compute cluster (`gpu-he`) with 6 V100 GPUs on
         --privacy_configs_csv_path fedlearn/clients_budget_demand.csv
     ```
 
-5. You should be able to obtain result that shows the accuracy after each round of training. 
+5. You should be able to obtain result that shows the accuracy after each round of training. For instance, here it shows 75.11 at the end of the third round of federated learning.
 
     ![Example result](fedlearn/example_result.png)
