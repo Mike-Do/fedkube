@@ -1,6 +1,6 @@
-# fedkube
+# Fedkube
 
-Extending PrivateKube with Federated Learning
+Extending PrivateKube with Federated Learning.
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ Extending PrivateKube with Federated Learning
 4. `python3 dataset.py getmini`
 5. `python3 convert_h5dataset_to_text.py`
 
-### Run the Cifar Example
+### Run the Federated Learning with Privacy Budget
 
 1. `cd example`
 2. `python3 server.py`
