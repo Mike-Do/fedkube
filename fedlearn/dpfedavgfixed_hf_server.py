@@ -18,6 +18,11 @@ import numpy as np
 import argparse
 
 class NormalShareClientManager(fl.server.SimpleClientManager):
+    """
+    This class is used to sample clients based on the Normal Share sampling algorithm.
+    Specifically, we inherit from the SimpleClientManager class and override the sample()
+    method to implement the Normal Share sampling algorithm.
+    """
     def __init__(self, total_clients, num_to_sample):
         super().__init__()
         self.total_clients = total_clients
@@ -105,6 +110,9 @@ def normal_share_sample(available_cids, client_id_properties, total_clients, num
     return sampled_cids
 
 def weighted_average(metrics):
+    """
+    This function takes in a list of tuples of metrics and returns the weighted average
+    """
     # Multiply accuracy of each client by number of examples used
     accuracies = [num_examples * m["accuracy"] for num_examples, m in metrics]
     examples = [num_examples for num_examples, _ in metrics]
