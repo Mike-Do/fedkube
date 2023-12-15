@@ -8,6 +8,11 @@ import torchvision.transforms as transforms
 from torch import Tensor
 from torchvision.datasets import CIFAR10
 
+"""
+This file contains an example of Flower on the CIFAR
+dataset. This code helped us become acquainted with 
+writing code using the framework.
+"""
 
 class Net(nn.Module):
     def __init__(self) -> None:
