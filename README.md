@@ -1,6 +1,13 @@
+<p align="center">
+    <img width="620" alt="Screenshot 2024-02-05 at 1 29 43 PM" src="https://github.com/Mike-Do/fedkube/assets/24444124/8b550f2e-09ed-4e29-974d-50da8062df69">
+</p>
+
+
 # Fedkube
 
-Extending PrivateKube with Federated Learning.
+Extending Columbia's [PrivateKube](https://github.com/columbia/PrivateKube) with Federated Learning.
+
+> **Click the brain and lock emojis for Presentation Link: [🧠🔒](https://www.canva.com/design/DAF13GlF3q4/4UoCB074ejB5735HfmL7mw/view?utm_content=DAF13GlF3q4&utm_campaign=designshare&utm_medium=link&utm_source=editor)**
 
 ## Getting Started with Fedkube
 
